@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Poker", "Poker\Poker.vcxproj", "{D5E52161-2116-4D7B-A309-A83FD8218B81}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A98E068C-8A51-4984-8375-A761E44D087D} = {A98E068C-8A51-4984-8375-A761E44D087D}
+		{D73B42D2-6BE5-4458-8A89-DC93BB288B55} = {D73B42D2-6BE5-4458-8A89-DC93BB288B55}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PokerUnitTest", "UnitTest1\UnitTest1.vcxproj", "{D73B42D2-6BE5-4458-8A89-DC93BB288B55}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A98E068C-8A51-4984-8375-A761E44D087D} = {A98E068C-8A51-4984-8375-A761E44D087D}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PokerLib", "PokerLib\PokerLib.vcxproj", "{A98E068C-8A51-4984-8375-A761E44D087D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D5E52161-2116-4D7B-A309-A83FD8218B81}.Debug|x64.ActiveCfg = Debug|x64
+		{D5E52161-2116-4D7B-A309-A83FD8218B81}.Debug|x64.Build.0 = Debug|x64
+		{D5E52161-2116-4D7B-A309-A83FD8218B81}.Debug|x86.ActiveCfg = Debug|Win32
+		{D5E52161-2116-4D7B-A309-A83FD8218B81}.Debug|x86.Build.0 = Debug|Win32
+		{D5E52161-2116-4D7B-A309-A83FD8218B81}.Release|x64.ActiveCfg = Release|x64
+		{D5E52161-2116-4D7B-A309-A83FD8218B81}.Release|x64.Build.0 = Release|x64
+		{D5E52161-2116-4D7B-A309-A83FD8218B81}.Release|x86.ActiveCfg = Release|Win32
+		{D5E52161-2116-4D7B-A309-A83FD8218B81}.Release|x86.Build.0 = Release|Win32
+		{D73B42D2-6BE5-4458-8A89-DC93BB288B55}.Debug|x64.ActiveCfg = Debug|x64
+		{D73B42D2-6BE5-4458-8A89-DC93BB288B55}.Debug|x64.Build.0 = Debug|x64
+		{D73B42D2-6BE5-4458-8A89-DC93BB288B55}.Debug|x86.ActiveCfg = Debug|Win32
+		{D73B42D2-6BE5-4458-8A89-DC93BB288B55}.Debug|x86.Build.0 = Debug|Win32
+		{D73B42D2-6BE5-4458-8A89-DC93BB288B55}.Release|x64.ActiveCfg = Release|x64
+		{D73B42D2-6BE5-4458-8A89-DC93BB288B55}.Release|x64.Build.0 = Release|x64
+		{D73B42D2-6BE5-4458-8A89-DC93BB288B55}.Release|x86.ActiveCfg = Release|Win32
+		{D73B42D2-6BE5-4458-8A89-DC93BB288B55}.Release|x86.Build.0 = Release|Win32
+		{A98E068C-8A51-4984-8375-A761E44D087D}.Debug|x64.ActiveCfg = Debug|x64
+		{A98E068C-8A51-4984-8375-A761E44D087D}.Debug|x64.Build.0 = Debug|x64
+		{A98E068C-8A51-4984-8375-A761E44D087D}.Debug|x86.ActiveCfg = Debug|Win32
+		{A98E068C-8A51-4984-8375-A761E44D087D}.Debug|x86.Build.0 = Debug|Win32
+		{A98E068C-8A51-4984-8375-A761E44D087D}.Release|x64.ActiveCfg = Release|x64
+		{A98E068C-8A51-4984-8375-A761E44D087D}.Release|x64.Build.0 = Release|x64
+		{A98E068C-8A51-4984-8375-A761E44D087D}.Release|x86.ActiveCfg = Release|Win32
+		{A98E068C-8A51-4984-8375-A761E44D087D}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
