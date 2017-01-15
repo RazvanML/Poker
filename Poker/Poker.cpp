@@ -7,7 +7,8 @@
 
 int main()
 {
-    std::cout << pk::Card(0);
+    std::cout << pk::Card(0) << std::endl;
+    std::cin.get();
     return 0;
 }
 

@@ -36,12 +36,15 @@ namespace pk {
         */
         int ordinal;
         
-        void init(char str[3]);
     public:
         Card(int ordinal) {
             this->ordinal = ordinal;
         }
 
+        // default constructor - an invalid card
+        Card() {
+            ordinal = -1;
+        }
 
         // convert from text form to internal
         // this is mainly for testing, user does not input cards
@@ -74,6 +77,28 @@ namespace pk {
         int getOrdinal() const {
             return ordinal;
         }
+// comparison
+// equal / non equal test for identity
+//  > and co. tests for "better card"
+        bool operator==(const Card c) const {
+            return ordinal == c.ordinal;
+        }
+        bool operator!=(const Card c) const {
+            return ordinal != c.ordinal;
+        }
+        bool operator>(const Card c) const {
+            return getNumber() > c.getNumber();
+        }
+        bool operator>=(const Card c) const {
+            return getNumber() >= c.getNumber();
+        }
+        bool operator<(const Card c) const {
+            return getNumber() < c.getNumber();
+        }
+        bool operator<=(const Card c) const {
+            return getNumber() <= c.getNumber();
+        }
+
     };
 
     std::ostream& operator<<(std::ostream& os, const Card& dt);
