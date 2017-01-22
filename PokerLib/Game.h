@@ -115,12 +115,13 @@ namespace pk {
 
             int gambleRound = 3;
             while (gambleRound >= 0) {
-
                 bool canRaise = (gambleRound != 0);
                 for (Player* p : players) {
                     // all in, no questions
-                    if (p->getChips() == 0)
+                    if (p->getChips() == 0) {
+                        pot->gamble(p, 0); // split the pot if needed
                         continue;
+                    }
                     int myMinEntry = minentry - pot->getFrontGambleAmount(p);
                     if (myMinEntry < 0)
                         myMinEntry = 0;
