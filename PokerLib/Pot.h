@@ -130,8 +130,8 @@ namespace pk {
                 throw std::exception("Winner vector should not be empty!!");
 
             // divide gains
-            int win = chips / winners.size();
-            chips -= win * winners.size();
+            int win = chips / (int)winners.size();
+            chips -= win * (int)winners.size();
             for (Player* p : winners)
                 p->win(win);
         }
