@@ -15,7 +15,7 @@ namespace pk {
             running,
             done
         } gameStateType;
-    private:
+    protected:
         std::map<Player*, int> forceBet;
         std::list<Player*> players;
         gameStateType state = gameStateType::starting;
@@ -60,10 +60,11 @@ namespace pk {
             std::set<Player*> pl;
             pl.insert(players.begin(), players.end());
             pot = new Pots(pl, residualAmt);
+            runRound(0, true);
 
-            for (Player *p : players) {
+            for (Player *p : players) 
                 p->giveCards(deck.getCard(), deck.getCard());
-            }
+            
             // you cannot simply check this round
             // either pay blind, or out
             if (!runRound(blindAmt))
@@ -99,8 +100,11 @@ namespace pk {
         bool runRound() {
             return runRound(0);
         }
-
         bool runRound(int minentry) {
+            return runRound(minentry, false);
+        }
+
+        bool runRound(int minentry, bool mandatoryOnly) {
 
             std::set<Player*> folds;
 
@@ -112,6 +116,8 @@ namespace pk {
                     pot->gamble(p, amt);
                 }
             }
+            if (mandatoryOnly)
+                return true;
 
             int gambleRound = 3;
             while (gambleRound >= 0) {

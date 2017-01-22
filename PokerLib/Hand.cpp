@@ -3,8 +3,12 @@
 
 namespace pk {
 
+    bool cardCompare(const Card& c1, const Card& c2) {
+        return c1.getOrdinal() < c2.getOrdinal();
+    }
+
     // sort cards by value reverse
-    static bool revCardCompare(const Card& c1, const Card& c2) {
+    bool revCardCompare(const Card& c1, const Card& c2) {
         return c1.getNumber() > c2.getNumber();
     }
 

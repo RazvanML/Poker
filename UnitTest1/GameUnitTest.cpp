@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "PlayerDecision.h"
 #include "Table.h"
+#include "Hand.h"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
@@ -36,11 +37,98 @@ static std::wstring charToWString(const char* text)
     return wstr;
 }
 
+bool compareVectors(std::vector<pk::Card> c1, std::vector<pk::Card> c2) {
+    std::sort(c1.begin(), c1.end(), pk::cardCompare);
+    std::sort(c2.begin(), c2.end(), pk::cardCompare);
+    if (c1.size() != c2.size())
+        return false;
+    for (int i = 0; i != c1.size(); i++)
+        if (c1[i] != c2[i])
+            return false;
+    return true;
+}
+
+class RiggedPlayer : public pk::Player {
+public:
+    RiggedPlayer(std::string name, int chips, std::vector<pk::Card> riggedCards):Player(name, chips) {
+        this->riggedCards = riggedCards;
+    }
+
+    std::vector<pk::Card> riggedCards;
+
+    virtual pk::PlayerDecision decide(int minToCall, bool canRaise) {
+        std::vector<pk::Card> crtCards = getCards();
+        Assert::IsTrue(compareVectors(crtCards , riggedCards), L"Dind't get the expected cards!");
+        return pk::PlayerDecision::call;
+    }
+
+};
+
+class RiggedGame : public pk::Game {
+public:
+    RiggedGame(int blindAmt, int residualAmt, std::vector<pk::Card> cards):
+        Game(blindAmt, residualAmt)  {
+        riverCards = cards;
+    }
+
+    // delete players, they are not used anymore.
+    ~RiggedGame() {
+        for (pk::Player*p : players)
+            delete p;
+    }
+
+    void addPlayer(RiggedPlayer* p, int forceBetAmt) {
+        Game::addPlayer(p, forceBetAmt);
+        playerCards[p] = p->riggedCards;
+    }
+
+    // cards that are going to run
+    std::map<pk::Player*, std::vector<pk::Card>> playerCards;
+    std::vector<pk::Card> riverCards;
+
+
+
+    void run() {
+        // prepare the deck
+        std::vector<pk::Card> cards;
+        for (pk::Player*p : players) {
+            if (playerCards.find(p) == playerCards.end())
+                throw std::exception("Missing cards from one player");
+            for (pk::Card c : playerCards[p])
+                cards.push_back(c);
+        }
+        for (pk::Card c : riverCards)
+            cards.push_back(c);
+        deck = pk::Deck(cards);
+
+        Game::run();
+        // make sure we ran with the cards we wanted
+        Assert::IsTrue(compareVectors(riverCards, communityCards), L"Didn't get the expected community cards");
+    }
+
+
+};
+
 namespace GameUnitTest
 {		
 	TEST_CLASS(GameUnitTest)
 	{
 	public:
+        TEST_METHOD(TestRiggedGame)
+        {
+            RiggedPlayer*p1 = new RiggedPlayer("P1", 100, { pk::Card("AH"),pk::Card("AD") });
+            RiggedPlayer*p2 = new RiggedPlayer("P2", 100, { pk::Card("KH"),pk::Card("KD") });
+            RiggedGame g(10, 7, {pk::Card("AS"),pk::Card("KS"),pk::Card("AC"),pk::Card("10S"),pk::Card("2D")});
+            g.addPlayer(p1, 5);
+            g.addPlayer(p2, 10);
+            g.run();
+            // p1 wins 10, p2 loses 10, 7 was the leftover
+            Assert::IsTrue(p1->getChips()==117);
+            Assert::IsTrue(p2->getChips() == 90);
+        }
+
+
+        // todo - move to table test
 		TEST_METHOD(TestTable)
 		{
             pk::Player* p1 = new PlayerAllCall("All call", 20);

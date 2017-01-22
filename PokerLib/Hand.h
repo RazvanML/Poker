@@ -58,5 +58,11 @@ namespace pk {
 
         static Hand getBestHand(const std::vector<Card> card1, const std::vector<Card> card2);
     };
+
+    bool cardCompare(const Card& c1, const Card& c2);
+
+    // sort cards by value reverse
+    bool revCardCompare(const Card& c1, const Card& c2);
+
 }
 

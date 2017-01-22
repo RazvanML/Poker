@@ -20,6 +20,8 @@ namespace pk {
             this->chips = chips;
         }
 
+        virtual ~Player() {};
+
         void giveCards(Card c1, Card c2) {
             cards.clear();
             cards.push_back(c1);
