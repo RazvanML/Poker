@@ -1,5 +1,6 @@
 #pragma once
 #include "card.h"
+
 namespace pk {
 
     // immutable class - a hand of poker and its value
@@ -7,7 +8,8 @@ namespace pk {
     {
     public:
         typedef enum {
-            highCard = 0,
+            invalid = -1,
+            highCard,
             onePair,
             twoPairs,
             threeOfAKind,
@@ -21,7 +23,7 @@ namespace pk {
     private:
 
         std::vector<Card> cards;
-        Level handLevel;
+        Level handLevel = invalid;
 
         // cards to evaluate the combination
         // example: two pairs J with A and one K
@@ -35,6 +37,10 @@ namespace pk {
     public:
 
         static const std::vector<std::string> HandNames;
+
+        Hand() {
+
+        };
 
         Hand(const std::vector<Card> cards);
 

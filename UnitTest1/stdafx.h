@@ -17,3 +17,6 @@
 #include<vector>
 #include<chrono>
 
+#include<algorithm>
+#include<random>
+#include<list>
