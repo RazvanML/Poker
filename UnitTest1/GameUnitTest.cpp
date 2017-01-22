@@ -36,12 +36,12 @@ static std::wstring charToWString(const char* text)
     return wstr;
 }
 
-namespace UnitTest1
+namespace GameUnitTest
 {		
-	TEST_CLASS(UnitTest1)
+	TEST_CLASS(GameUnitTest)
 	{
 	public:
-		TEST_METHOD(TestMethod1)
+		TEST_METHOD(TestTable)
 		{
             pk::Player* p1 = new PlayerAllCall("All call", 20);
             pk::Player* p2 = new PlayerAllFold("All fold", 20);

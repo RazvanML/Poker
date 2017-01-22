@@ -21,7 +21,7 @@ namespace pk {
         }
 
         void giveCards(Card c1, Card c2) {
-            cards.empty();
+            cards.clear();
             cards.push_back(c1);
             cards.push_back(c2);
         }

@@ -26,121 +26,126 @@ namespace pk {
 
     Hand::Hand(const std::vector<Card> c) {
         this->cards = c;
-        std::sort(cards.begin(), cards.end(), revCardCompare);
-        // determine hand type.
+        try {
+            std::sort(cards.begin(), cards.end(), revCardCompare);
+            // determine hand type.
 
-        // count repeated cards
-        std::vector<CardRepeat> repeatsCard;
-        CardRepeat first, *crt=&first;
-        for (Card c : cards) {
-            if (c.getNumber() == crt->first.getNumber())
-                crt->count++;
-            else {
-                CardRepeat newrep(c);
-                repeatsCard.push_back(newrep);
-                crt = &(*(repeatsCard.end() - 1)); // reference to the last
+            // count repeated cards
+            std::vector<CardRepeat> repeatsCard;
+            CardRepeat first, *crt = &first;
+            for (Card c : cards) {
+                if (c.getNumber() == crt->first.getNumber())
+                    crt->count++;
+                else {
+                    CardRepeat newrep(c);
+                    repeatsCard.push_back(newrep);
+                    crt = &(*(repeatsCard.end() - 1)); // reference to the last
+                }
             }
+            std::sort(repeatsCard.begin(), repeatsCard.end(), CardRepeat::revCardRepeatCompare);
+
+            // count colors
+            std::vector<int> colors(4);
+            std::fill(colors.begin(), colors.end(), 0);
+            for (Card c : cards) colors[c.getColor()]++;
+
+            bool isSameColor = false;
+            for (int c : colors)
+                if (c == 5) // 5 cards of the same
+                    isSameColor = true;
+
+            // special cards
+            int aceNumber = Card("AH").getNumber();
+            int kingNumber = Card("KH").getNumber();
+            int fiveNumber = Card("5H").getNumber();
+
+            bool isProgression = false;
+            if (cards.size() == 5) {
+                // only if there are 5 cards
+                isProgression = true;
+                for (int i = 1; i != cards.size(); i++)
+                    // in case of ace low straight
+                    // ace comes legitimely before 5.
+                    if (cards[i - 1].getNumber() != cards[i].getNumber() + 1 &&
+                        !((cards[i - 1].getNumber() == aceNumber) && (cards[i].getNumber() == fiveNumber)))
+                        isProgression = false;
+            }
+
+            // testing from high to low.
+
+            // royal flush is a progression
+            // testing for second card king, to remove the ace-low case
+            if (isProgression && isSameColor && cards[1].getNumber() == kingNumber) {
+                handLevel = Level::royalFlush;
+                return;
+            }
+
+            if (isProgression && isSameColor) {
+                handLevel = Level::straightFlush;
+                // streight flush is evaluated by the second card
+                // to distinguish between ace low-ace high case
+                evalCards.push_back(cards[1]);
+                return;
+            }
+
+            if (repeatsCard[0].count == 4) {
+                handLevel = Level::fourOfAKind;
+                evalCards.push_back(repeatsCard[0].first);
+                if (repeatsCard.size() > 1) // avoid crashing if only 4 cards
+                    evalCards.push_back(repeatsCard[1].first);
+                return;
+            }
+
+            if (repeatsCard.size() == 2 && repeatsCard[0].count == 3 && repeatsCard[1].count == 2) {
+                handLevel = Level::fullHouse;
+                for (CardRepeat r : repeatsCard)
+                    evalCards.push_back(r.first);
+                return;
+            }
+
+            if (isSameColor) {
+                handLevel = Level::flush;
+                for (Card c : cards)
+                    evalCards.push_back(c);
+                return;
+            }
+
+            if (isProgression) {
+                handLevel = Level::straight;
+                // second card only - to distinguish between
+                // ace-low and ace-high
+                evalCards.push_back(cards[1]);
+                return;
+            }
+
+            if (repeatsCard[0].count == 3) {
+                handLevel = Level::threeOfAKind;
+                for (CardRepeat r : repeatsCard)
+                    evalCards.push_back(r.first);
+                return;
+            }
+
+            if (repeatsCard.size() > 1 && repeatsCard[0].count == 2 && repeatsCard[1].count == 2) {
+                handLevel = Level::twoPairs;
+                for (CardRepeat r : repeatsCard)
+                    evalCards.push_back(r.first);
+                return;
+            }
+
+            if (repeatsCard[0].count == 2) {
+                handLevel = Level::onePair;
+                for (CardRepeat r : repeatsCard)
+                    evalCards.push_back(r.first);
+                return;
+            }
+
+            // this is left.
+            handLevel = Level::highCard;
+            evalCards = cards;
         }
-        std::sort(repeatsCard.begin(), repeatsCard.end(), CardRepeat::revCardRepeatCompare);
-
-        // count colors
-        std::vector<int> colors(4);
-        std::fill(colors.begin(), colors.end(), 0);
-        for (Card c : cards) colors[c.getColor()]++;
-
-        bool isSameColor = false;
-        for (int c : colors)
-            if (c == 5) // 5 cards of the same
-                isSameColor = true;
-
-        // special cards
-        int aceNumber = Card("AH").getNumber();
-        int kingNumber = Card("KH").getNumber();
-        int fiveNumber = Card("5H").getNumber();
-
-        bool isProgression = false;
-        if (cards.size() == 5) {
-            // only if there are 5 cards
-            isProgression = true;
-            for (int i = 1; i != cards.size(); i++)
-                // in case of ace low straight
-                // ace comes legitimely before 5.
-                if (cards[i - 1].getNumber() != cards[i].getNumber() + 1 &&
-                    !((cards[i - 1].getNumber()==aceNumber )&& (cards[i].getNumber() == fiveNumber)) )
-                    isProgression = false;
+        catch (...) {
+            throw std::exception("Internal error while evaluating the cards");
         }
-
-        // testing from high to low.
-
-        // royal flush is a progression
-        // testing for second card king, to remove the ace-low case
-        if (isProgression && isSameColor && cards[1].getNumber() == kingNumber) {
-            handLevel = Level::royalFlush;
-            return;
-        }
-
-        if (isProgression && isSameColor) {
-            handLevel = Level::straightFlush;
-            // streight flush is evaluated by the second card
-            // to distinguish between ace low-ace high case
-            evalCards.push_back(cards[1]);
-            return;
-        }
-
-        if (repeatsCard[0].count == 4) {
-            handLevel = Level::fourOfAKind;
-            evalCards.push_back(repeatsCard[0].first);
-            if (repeatsCard.size() > 1) // avoid crashing if only 4 cards
-                evalCards.push_back(repeatsCard[1].first);
-            return;
-        }
-
-        if (repeatsCard.size() == 2 && repeatsCard[0].count == 3 && repeatsCard[1].count == 2) {
-            handLevel = Level::fullHouse;
-            for (CardRepeat r : repeatsCard)
-                evalCards.push_back(r.first);
-            return;
-        }
-
-        if (isSameColor) {
-            handLevel = Level::flush;
-            for (Card c: cards)
-                evalCards.push_back(c);
-            return;
-        }
-
-        if (isProgression) {
-            handLevel = Level::straight;
-            // second card only - to distinguish between
-            // ace-low and ace-high
-            evalCards.push_back(cards[1]);
-            return;
-        }
-
-        if (repeatsCard[0].count == 3) {
-            handLevel = Level::threeOfAKind;
-            for (CardRepeat r : repeatsCard) 
-                evalCards.push_back(r.first);            
-            return;
-        }
-
-        if (repeatsCard.size() > 1 && repeatsCard[0].count == 2 && repeatsCard[1].count == 2) {
-            handLevel = Level::twoPairs;
-            for (CardRepeat r : repeatsCard)
-                evalCards.push_back(r.first);
-            return;
-        }
-
-        if (repeatsCard[0].count == 2) {
-            handLevel = Level::onePair;
-            for (CardRepeat r : repeatsCard)
-                evalCards.push_back(r.first);
-            return;
-        }
-
-        // this is left.
-        handLevel = Level::highCard;
-        evalCards = cards;
         return;
     }
 
@@ -149,9 +154,12 @@ namespace pk {
         if (handLevel != h.handLevel) {
             return (handLevel > h.handLevel);
         }
-        for (int i = 0; i != std::min(evalCards.size(), h.evalCards.size()); i++)
+        for (int i = 0; i != std::min(evalCards.size(), h.evalCards.size()); i++) {
             if (evalCards[i].getNumber() > h.evalCards[i].getNumber())
                 return true;
+            if (evalCards[i].getNumber() < h.evalCards[i].getNumber())
+                return false;
+        }
         return false;
     }
 

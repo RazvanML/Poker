@@ -39,12 +39,13 @@ namespace pk {
         // a) going all in -  need to split appropriately the existing pots
         // b) has to cover all calls + eventual raise.
         void gamble(Player *player, int amt) {
+            std::vector<Pot*> newPots;
             for (Pot* p : pots) {
                 int call = p->getCallValue(player);
                 if (call > amt) {
                     // not enough to cover
                     Pot *newPot = new Pot(*p, player);
-                    pots.push_back(newPot);
+                    newPots.push_back(newPot);
                     amt = 0;
                     if (crt == p)
                         crt = newPot;
@@ -55,9 +56,13 @@ namespace pk {
                 }
             }
 
+            // add new pots.
+            for (Pot* p : newPots) 
+                pots.push_back(p);
+            
+
             // still something left ...
-            if (amt != 0)
-                crt->gamble(player, amt);
+            crt->gamble(player, amt);
         }
         
 

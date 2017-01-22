@@ -38,6 +38,8 @@ namespace pk {
         Pot(std::set<Player*> players) :Pot(players, 0) {};
 
         void gamble(Player*p, int amt) {
+            if (amt == 0) // not actually a gamble.
+                return;
             if (p->getChips() < amt)
                 throw std::exception("Invalid betting amount");
             p->gamble(amt);
@@ -124,6 +126,8 @@ namespace pk {
                 if (best)
                     winners.insert(p);
             }
+            if (winners.size() == 0)
+                throw std::exception("Winner vector should not be empty!!");
 
             // divide gains
             int win = chips / winners.size();

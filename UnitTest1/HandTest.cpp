@@ -126,6 +126,16 @@ namespace HandTest
             Assert::IsTrue(fourQ < fourK);
         }
 
+        TEST_METHOD(TestABug)
+        {
+            Hand h1{ {Card(49),Card(38),Card(37) ,Card(10) ,Card(11) } };
+            Hand h2{ { Card(38),Card(37),Card(29) ,Card(31) ,Card(19) } };
+
+            Assert::IsTrue(h2 > h1);
+            Assert::IsFalse(h1 > h2);
+
+        }
+
 
 	};
 }
