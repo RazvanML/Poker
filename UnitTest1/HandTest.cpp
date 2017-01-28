@@ -126,6 +126,11 @@ namespace HandTest
             Assert::IsTrue(fourQ < fourK);
         }
 
+        // bug, was crashing in this case, because of empty repeat.
+        TEST_METHOD(TwoCardsHand) {
+            Hand h1{ {Card(0), Card(3)} };
+        }
+
         TEST_METHOD(TestABug)
         {
             // two pairs. > has not functioned correctly

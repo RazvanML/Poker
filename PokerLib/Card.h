@@ -43,7 +43,7 @@ namespace pk {
 
         // default constructor - an invalid card
         Card() {
-            ordinal = -1;
+            ordinal = -99;
         }
 
         // convert from text form to internal

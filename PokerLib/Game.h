@@ -3,10 +3,11 @@
 #include "Deck.h"
 #include "Pots.h"
 #include "Hand.h"
+#include "Event.h"
 
 namespace pk {
 
-    class Game
+    class Game: public EventGenerator
     {
         friend class Table;
     public:
@@ -62,8 +63,9 @@ namespace pk {
             pot = new Pots(pl, residualAmt);
             runRound(0, true);
 
-            for (Player *p : players) 
+            for (Player *p : players)
                 p->giveCards(deck.getCard(), deck.getCard());
+            
             
             // you cannot simply check this round
             // either pay blind, or out
@@ -74,12 +76,17 @@ namespace pk {
             communityCards.push_back(deck.getCard());
             communityCards.push_back(deck.getCard());
             // announce.
+            generateEvent(Event(Event::communityCards,NULL, communityCards));
+
+
             if (!runRound())
                 return;
             communityCards.push_back(deck.getCard());
+            generateEvent(Event(Event::communityCards, NULL, communityCards));
             if (!runRound())
                 return;
             communityCards.push_back(deck.getCard());
+            generateEvent(Event(Event::communityCards, NULL, communityCards));
             if (!runRound())
                 return;
 
@@ -90,6 +97,8 @@ namespace pk {
         void winners() {
             std::map<Player*, Hand> standing;
             for (Player *p : players) {
+                if (players.size() > 1) // only show cards when multiple players
+                    generateEvent(Event(Event::showCards, p, p->getCards()));
                 Hand h = Hand::getBestHand(p->getCards(), communityCards);
                 standing[p] = h;
             }
@@ -104,6 +113,7 @@ namespace pk {
             return runRound(minentry, false);
         }
 
+        // game shall end? return false.
         bool runRound(int minentry, bool mandatoryOnly) {
 
             std::set<Player*> folds;
@@ -133,11 +143,26 @@ namespace pk {
                         myMinEntry = 0;
                     int mincall = std::min(p->getChips(), pot->getCallAmount(p));
                     mincall = std::min(mincall, myMinEntry);
-                    PlayerDecision pf = p->decide(mincall, canRaise);
+
+                    //am i alone?
+                    int gambleAgainst = 0;
+                    for (Player* p1 : players) {
+                        if (p1 != p && p1->getChips())
+                            gambleAgainst++;
+                    }
+                    if (!gambleAgainst)
+                        canRaise = false;
+
+                    // decide what to do
+                    // if alone, do an automatic check.
+                    PlayerDecision pf(PlayerDecision::DecisionType::call);
+                    if (! (canRaise == 0 && mincall ==0 ))
+                        pf = p->decide(mincall, canRaise);
                     switch (pf.getDecision()) {
                     case PlayerDecision::DecisionType::fold:
                         folds.insert(p);
                         pot->fold(p);
+                        generateEvent(Event(Event::fold, p));
                         break;
                     case PlayerDecision::DecisionType::allIn:
                         if (!canRaise && p->getChips() > mincall)
@@ -146,6 +171,8 @@ namespace pk {
                         break;
                     case PlayerDecision::DecisionType::call:
                         pot->gamble(p, mincall);
+                        if (mincall == 0)
+                            generateEvent(Event(Event::check, p));
                         break;
                     case PlayerDecision::DecisionType::raise:
                         if (!canRaise)
@@ -176,6 +203,7 @@ namespace pk {
             if (!pot->checkBalanced()) {
                 throw std::exception("Unbalanced even after the last round!!");
             }
+            return true;
         }
 
     };

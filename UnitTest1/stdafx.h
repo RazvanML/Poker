@@ -20,3 +20,5 @@
 #include<algorithm>
 #include<random>
 #include<list>
+
+#include<strstream>

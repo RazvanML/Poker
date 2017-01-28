@@ -2,15 +2,17 @@
 
 #include "Card.h"
 #include "PlayerDecision.h"
-
+#include "Event.h"
 namespace pk {
-    class Player
+    class Player: public EventGenerator
     {
     private:
         std::string name;
         int chips;
         std::vector<Card> cards;
+
     public:
+
         const std::vector<Card>& getCards() const {
             return cards;
         }
@@ -26,6 +28,7 @@ namespace pk {
             cards.clear();
             cards.push_back(c1);
             cards.push_back(c2);
+            generateEvent(Event(Event::getCards, this, cards));
         }
 
         bool isBankrupt() const {
@@ -41,13 +44,17 @@ namespace pk {
         }
 
         void gamble(int amount) {
+            if (amount == 0)
+                return;
             chips -= amount;
             if (chips < 0)
                 throw std::exception("No overdraft in poker!");
+            generateEvent(Event(Event::bet, this, amount));
         }
 
         void win(int amount) {
             chips += amount;
+            generateEvent(Event(Event::win, this, amount));
         }
 
         // implemented by specific AI/GUI/etc.

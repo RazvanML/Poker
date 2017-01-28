@@ -18,10 +18,11 @@ namespace pk {
 
         // player goes all in, but with not enough funds.
         // new pot created, player excluded from the new pot
-        Pot(Pot initial, Player* short1) {
-            int chips = short1->getChips();
-            short1->gamble(chips);
-            initial.currentBetRound[short1] += chips;
+        Pot(Pot& initial, Player* short1) {
+            chips = 0;
+            int chips1 = short1->getChips();
+            short1->gamble(chips1);
+            initial.currentBetRound[short1] += chips1;
             
             players.insert(initial.players.begin(), initial.players.end());
             players.erase(short1);
@@ -29,7 +30,7 @@ namespace pk {
             for (Player* p : players) {
                 currentBetRound[p] = 0;
                 if (initial.currentBetRound[p] > initial.currentBetRound[short1]) {
-                    currentBetRound[p] -= initial.currentBetRound[p] - initial.currentBetRound[short1];
+                    currentBetRound[p] = initial.currentBetRound[p] - initial.currentBetRound[short1];
                     initial.currentBetRound[p] = initial.currentBetRound[short1];
                 }
             }
@@ -110,7 +111,6 @@ namespace pk {
         void computeWinner(const std::map<Player*, Hand>& standing) {
             if (!checkBalanced())
                 throw std::exception("Cannot compute winner, bet in progress");
-
             // determine winners
             std::set<Player*> winners;
             for (Player*p : players) {

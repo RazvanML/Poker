@@ -7,11 +7,13 @@
 
 #include "Player.h"
 #include "Game.h"
+#include "Event.h"
 namespace pk {
-    class Table
+    class Table: EventGenerator
     {
     private:
         int maxSeats=10;  // at most 24, otherwise, no cards.
+
 
         // manage blinds increased value
         // BetScheduler blindSched;
@@ -19,6 +21,7 @@ namespace pk {
 
         // owning the players..
         std::vector<Player*> players;
+        EventCollector theEventCollector;
 
         // get the next player, as they sit on the table.
         Player* getNext(Player* p) {
@@ -34,7 +37,7 @@ namespace pk {
         }
 
     public:
-        Table() {};
+        Table() { setEventCollector(theEventCollector); };
         ~Table() {
             for (Player *p : players)
                 delete p;
@@ -43,6 +46,7 @@ namespace pk {
         
 
         void addPlayer(Player* p) {
+            p->setEventCollector(theEventCollector);
             players.push_back(p);
         }
 
@@ -57,9 +61,12 @@ namespace pk {
                 do {
                     ordering.push_back(crt1);
                     crt1 = getNext(crt1);
+                    generateEvent(Event(Event::join, crt1));
                 } while (crt1 != crt);
 
                 Game g(blind, residual);
+                g.setEventCollector(theEventCollector);
+
                 for (Player *p : ordering) {
                     int minbet = 0;
                     if (p == ordering[ordering.size()-1])
@@ -69,12 +76,7 @@ namespace pk {
                     // TODO - ante bet
                     g.addPlayer(p, minbet);
                 }
-                try {
-                    g.run();
-                }
-                catch (std::exception e) {
-                    e.what();
-                }
+                g.run();
                 residual = g.getResidualAmt();
 
                 // determine next crt
@@ -95,6 +97,9 @@ namespace pk {
             }
             // this is the winner!
             return players[0];
+        }
+        void registerListener(EventListener* listener, const Player *p) {
+            theEventCollector.registerListener(listener, p);
         }
 
     };
